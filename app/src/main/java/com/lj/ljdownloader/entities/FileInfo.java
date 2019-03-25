@@ -5,18 +5,28 @@ import java.io.Serializable;
 public class FileInfo implements Serializable {
     private int id;
     private String url;
+    private String fileName;
+    private int length;
+    private int finished;
 
-    public FileInfo(int id, String url, String fileName, int length, int finished) {
+    private String extend;
+
+    public FileInfo(int id, String url, String fileName, int length, int finished, String extend) {
         this.id = id;
         this.url = url;
         this.fileName = fileName;
         this.length = length;
         this.finished = finished;
+        this.extend = extend;
     }
 
-    private String fileName;
-    private int length;
-    private int finished;
+    public String getExtend() {
+        return extend;
+    }
+
+    public void setExtend(String extend) {
+        this.extend = extend;
+    }
 
     public int getId() {
         return id;
@@ -56,5 +66,11 @@ public class FileInfo implements Serializable {
 
     public void setFinished(int finished) {
         this.finished = finished;
+    }
+
+
+    @Override
+    public String toString() {
+        return id + "  " + url + "  " + fileName + "  " + length + "  " + finished + extend;
     }
 }

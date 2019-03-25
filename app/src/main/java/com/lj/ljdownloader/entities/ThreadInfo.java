@@ -17,6 +17,9 @@ public class ThreadInfo implements Serializable {
         this.finished = finished;
     }
 
+    public ThreadInfo() {
+    }
+
     public int getId() {
         return id;
     }

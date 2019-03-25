@@ -2,6 +2,7 @@ package com.lj.ljdownloader.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.lj.ljdownloader.db.ThreadDAO;
 import com.lj.ljdownloader.db.ThreadDAOImpl;
@@ -18,6 +19,7 @@ import java.util.List;
 
 
 public class DownloadWorker {
+    public static final String TAG = "DownloadWorker";
     private Context mContext = null;
     private FileInfo mFileInfo = null;
     private ThreadDAO mDAO = null;
@@ -33,6 +35,7 @@ public class DownloadWorker {
     public void download() {
         List<ThreadInfo> threadInfos = mDAO.getThreads(mFileInfo.getUrl());
         ThreadInfo threadInfo = null;
+        Log.d(TAG, mFileInfo.toString());
         if (threadInfos.size() == 0) {
             threadInfo = new ThreadInfo(0, mFileInfo.getUrl(), 0, mFileInfo.getLength(), 0);
 
@@ -63,7 +66,7 @@ public class DownloadWorker {
                 connection.setRequestMethod("GET");
                 int start = mThreadInfo.getStart() + mThreadInfo.getFinished();
                 connection.setRequestProperty("Range", "bytes=" + start + "-" + mThreadInfo.getEnd());
-                File file = new File(DownloadService.DOWNLOAD_PATH, mFileInfo.getFileName());
+                File file = new File(DownloadService.DOWNLOAD_PATH, mFileInfo.getFileName() + mFileInfo.getExtend());
                 raf = new RandomAccessFile(file, "rwd");
                 raf.seek(start);
                 mFinished += mThreadInfo.getFinished();
@@ -79,16 +82,18 @@ public class DownloadWorker {
                         if (System.currentTimeMillis() - time > 500) {
                             time = System.currentTimeMillis();
                             mDAO.updateThread(mFileInfo.getUrl(), mThreadInfo.getId(), mFinished);
+                            Log.d(TAG, String.valueOf(mFinished));
                             intent.putExtra("finished", mFinished * 100 / mFileInfo.getLength());
                             mContext.sendBroadcast(intent);
                             if (isPause) {
                                 return;
                             }
                         }
-                        if (isPause) {
-                            mDAO.updateThread(mFileInfo.getUrl(), mThreadInfo.getId(),mFinished);
-                            return;
-                        }
+//                        if (isPause) {
+//                            Log.d(TAG, "this should not appear");
+//                            mDAO.updateThread(mFileInfo.getUrl(), mThreadInfo.getId(),mFinished);
+//                            return;
+//                        }
                     }
                     intent.putExtra("finished", 100);
                     mContext.sendBroadcast(intent);
