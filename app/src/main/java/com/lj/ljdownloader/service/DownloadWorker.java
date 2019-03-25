@@ -2,6 +2,7 @@ package com.lj.ljdownloader.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import com.lj.ljdownloader.db.ThreadDAO;
@@ -19,6 +20,7 @@ import java.util.List;
 
 
 public class DownloadWorker {
+    private Handler handler;
     public static final String TAG = "DownloadWorker";
     private Context mContext = null;
     private FileInfo mFileInfo = null;
@@ -26,9 +28,10 @@ public class DownloadWorker {
     private int mFinished;
     public boolean isPause = false;
 
-    public DownloadWorker(Context mContext, FileInfo mFileInfo) {
+    public DownloadWorker(Context mContext, FileInfo mFileInfo, Handler handler) {
         this.mContext = mContext;
         this.mFileInfo = mFileInfo;
+        this.handler = handler;
         mDAO = new ThreadDAOImpl(mContext);
     }
 
@@ -83,9 +86,11 @@ public class DownloadWorker {
                             time = System.currentTimeMillis();
                             mDAO.updateThread(mFileInfo.getUrl(), mThreadInfo.getId(), mFinished);
                             Log.d(TAG, String.valueOf(mFinished));
+                            Log.d(TAG, mThreadInfo.toString());
                             intent.putExtra("finished", mFinished * 100 / mFileInfo.getLength());
                             mContext.sendBroadcast(intent);
                             if (isPause) {
+                                handler.obtainMessage(DownloadService.MEG_UPDATE, mFileInfo).sendToTarget();
                                 return;
                             }
                         }

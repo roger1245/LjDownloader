@@ -59,4 +59,9 @@ public class ThreadInfo implements Serializable {
     public void setFinished(int finished) {
         this.finished = finished;
     }
+
+    @Override
+    public String toString() {
+        return "id:" + id + "  url:" + url + "  start:" + start + "  end:" + end + "  finished:" + finished ;
+    }
 }
